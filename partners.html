@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제휴 업장 안내 | 콕패스 KOKPASS</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap');
+  :root{
+    --navy:#0A1930;--navy2:#0F2A4A;--navy3:#123354;--blue:#2B7FD1;--sky:#7FC4F5;
+    --teal:#12B886;--mint:#6EE7C8;--cream:#F6F8FB;--ink:#101826;--gray:#5B677A;--line:#E4E9F1;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard',-apple-system,sans-serif;color:var(--ink);background:#fff;line-height:1.6}
+  a{text-decoration:none;color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(10,25,48,.72);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand .wordmark{font-weight:700;font-size:16.5px;letter-spacing:-.1px;color:#fff}
+  .brand .wordmark small{display:block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--sky)}
+  .nav-links{display:flex;align-items:center;gap:30px}
+  .nav-links a{font-size:13.5px;font-weight:600;color:rgba(255,255,255,.8)}
+  .nav-links a:hover{color:#fff}
+  .nav-cta{background:var(--sky);color:var(--navy)!important;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700}
+  .nav-cta:hover{background:#fff}
+
+  .page-hero{position:relative;background:radial-gradient(120% 100% at 50% -10%,#132C4E 0%,var(--navy) 55%,#081527 100%);padding:60px 0 44px;text-align:center;overflow:hidden}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.16em;color:var(--mint);text-transform:uppercase;margin-bottom:14px}
+  .page-hero h1{font-size:clamp(24px,3.4vw,34px);font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:-.4px}
+  .page-hero p{font-size:14.5px;color:rgba(255,255,255,.62);max-width:540px;margin:0 auto}
+
+  section{padding:56px 0}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:12px}
+  .count-pill{font-family:var(--mono);font-size:12px;color:var(--gray);border:1px solid var(--line);padding:6px 14px;border-radius:20px}
+  .prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:900px){.prod-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.prod-grid{grid-template-columns:1fr}}
+  .prod-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+  .prod-card:hover{transform:translateY(-4px);box-shadow:0 18px 36px rgba(10,25,48,.09)}
+  .prod-thumb{height:118px;display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,var(--navy),var(--blue))}
+  .prod-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .prod-body{padding:18px 20px 20px}
+  .prod-name{font-size:15.5px;font-weight:700;margin-bottom:2px}
+  .prod-sub{font-family:var(--mono);font-size:10.5px;color:var(--gray);margin-bottom:9px}
+  .prod-desc{font-size:12.5px;color:var(--gray);line-height:1.6;margin-bottom:14px;min-height:38px}
+  .prod-foot{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--line)}
+  .prod-price{font-size:14px;font-weight:800;color:var(--blue)}
+  .prod-price small{font-size:10.5px;font-weight:500;color:var(--gray)}
+  .prod-badge{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;color:var(--teal);background:rgba(18,184,134,.09);padding:3px 8px;border-radius:5px}
+  .prod-empty{grid-column:1/-1;text-align:center;color:var(--gray);padding:40px}
+
+  .cta-band{background:var(--cream);text-align:center;padding:56px 0}
+  .cta-band h2{font-size:22px;font-weight:700;margin-bottom:10px}
+  .cta-band p{font-size:13.5px;color:var(--gray);margin-bottom:20px}
+  .contact-pill{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;padding:12px 22px;border-radius:9px;font-size:13.5px;font-weight:700;font-family:var(--mono)}
+  .contact-pill:hover{background:var(--blue)}
+
+  footer{background:var(--navy);color:rgba(255,255,255,.5);padding:34px 0;font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="brand">
+      <svg width="28" height="28" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="34" fill="none" stroke="#7FC4F5" stroke-width="7"/><circle cx="48" cy="48" r="9" fill="#7FC4F5"/><line x1="48" y1="6" x2="48" y2="20" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/><line x1="48" y1="76" x2="48" y2="90" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/><line x1="6" y1="48" x2="20" y2="48" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/><line x1="76" y1="48" x2="90" y2="48" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/></svg>
+      <span class="wordmark">콕패스<small>KOKPASS</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="shop.html">개인 구매</a>
+      <a href="partners.html">제휴 업장</a>
+      <a href="login.html" class="nav-cta">로그인</a>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <div class="sec-tag">Partner Venues</div>
+    <h1>제휴 업장 안내</h1>
+    <p>콕패스는 개인 방문객에게 입장권을 판매하는 FIT 티켓 플랫폼입니다. 현재 재고·채널 API로 연동된 제휴 업장 목록이며, 신규 제휴 문의는 아래를 이용해주세요.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="toolbar">
+      <span class="count-pill" id="count-pill">상품 불러오는 중…</span>
+    </div>
+    <div id="product-grid" class="prod-grid">
+      <div class="prod-empty">상품 정보를 불러오는 중입니다...</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>제휴·채널 연동 문의</h2>
+    <p>재고 연동, B2B 채널 API, 파트너 계약 관련 문의는 아래로 연락해주세요.</p>
+    <a href="mailto:partners@groobit.kr" class="contact-pill">partners@groobit.kr</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">KOKPASS (프로토타입) · 개인 FIT 티켓팅 플랫폼 · 상품 데이터는 더블에이치컴퍼니 시스템과 연동되어 표시됩니다.</div>
+</footer>
+
+<script>
+  const SB_URL = 'https://xoupacfmkhuuvxebgfqi.supabase.co';
+  const SB_KEY = 'sb_publishable_46KQebvC7_S-_JDramvDmA_jk9aSeVc';
+  async function sbFetch(path) {
+    const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
+    });
+    if (!res.ok) throw new Error(`오류 ${res.status}`);
+    return res.json();
+  }
+
+  function money(n) { return Number(n || 0).toLocaleString('ko-KR') + '원'; }
+
+  function cardHtml(p) {
+    const tickets = p.tickets || [];
+    const minPrice = tickets.length ? Math.min(...tickets.map(t => t.price || 0)) : 0;
+    const thumb = p.image_url
+      ? `<div class="prod-thumb"><img src="${p.image_url}" alt="${p.vname || p.name}"></div>`
+      : `<div class="prod-thumb" style="background:${p.gradient || 'linear-gradient(135deg,#0A1930,#2B7FD1)'}">${p.emoji || '🎡'}</div>`;
+    return `<div class="prod-card">
+      ${thumb}
+      <div class="prod-body">
+        <div class="prod-name">${p.vname || p.name}</div>
+        <div class="prod-sub">${p.name}</div>
+        <div class="prod-desc">${p.desc || ''}</div>
+        <div class="prod-foot">
+          <span class="prod-price">${minPrice ? money(minPrice) + '~' : '문의'} <small>기준가</small></span>
+          ${p.hot ? '<span class="prod-badge">POPULAR</span>' : ''}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  async function loadProducts() {
+    const grid = document.getElementById('product-grid');
+    const countPill = document.getElementById('count-pill');
+    try {
+      const rows = await sbFetch('products_public?select=*&visible=eq.true&order=sort_order.asc');
+      if (!rows || !rows.length) { grid.innerHTML = '<div class="prod-empty">등록된 상품이 없습니다.</div>'; countPill.textContent = '0종 연동'; return; }
+      grid.innerHTML = rows.map(cardHtml).join('');
+      countPill.textContent = rows.length + '종 실시간 연동';
+    } catch (e) {
+      grid.innerHTML = '<div class="prod-empty">상품 정보를 불러오지 못했습니다.</div>';
+      countPill.textContent = '연동 오류';
+    }
+  }
+  loadProducts();
+</script>
+</body>
+</html>

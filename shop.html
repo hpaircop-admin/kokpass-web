@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>개인 구매 | 콕패스 KOKPASS</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.tosspayments.com/v1/payment"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap');
+  :root{
+    --navy:#0A1930;--navy2:#0F2A4A;--navy3:#123354;--blue:#2B7FD1;--sky:#7FC4F5;
+    --teal:#12B886;--mint:#6EE7C8;--cream:#F6F8FB;--ink:#101826;--gray:#5B677A;--line:#E4E9F1;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard',-apple-system,sans-serif;color:var(--ink);background:var(--cream);line-height:1.6;min-height:100vh}
+  a{text-decoration:none;color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(10,25,48,.72);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand .wordmark{font-weight:700;font-size:16.5px;letter-spacing:-.1px;color:#fff}
+  .brand .wordmark small{display:block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--sky)}
+  .nav-links{display:flex;align-items:center;gap:22px}
+  .nav-links a{font-size:13px;font-weight:600;color:rgba(255,255,255,.8)}
+  .nav-links a:hover{color:#fff}
+
+  .page-hero{position:relative;background:radial-gradient(120% 100% at 50% -10%,#132C4E 0%,var(--navy) 55%,#081527 100%);padding:46px 0}
+  .sec-tag{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--mint);text-transform:uppercase;margin-bottom:10px}
+  .page-hero h1{font-size:24px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-.4px}
+  .page-hero p{font-size:13.5px;color:rgba(255,255,255,.62)}
+
+  .content{padding:36px 0 60px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+  .card{background:#fff;border-radius:14px;box-shadow:0 6px 20px rgba(10,25,48,.07);overflow:hidden;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(10,25,48,.1)}
+  .card-top{background:linear-gradient(135deg,var(--navy),var(--blue));padding:20px;color:#fff}
+  .card-top .emoji{font-size:22px;margin-bottom:8px}
+  .card-top .venue{font-size:15px;font-weight:700}
+  .card-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .card-body .desc{font-size:12.5px;color:var(--gray);line-height:1.6;flex:1}
+  .card-price{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--teal)}
+  .card-price small{font-family:'Pretendard',sans-serif;font-size:10.5px;color:var(--gray);font-weight:600}
+  .buy-btn{display:block;width:100%;text-align:center;background:linear-gradient(120deg,var(--blue),var(--teal));color:#fff;font-size:13.5px;font-weight:700;padding:12px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;transition:opacity .15s}
+  .buy-btn:hover{opacity:.9}
+
+  .empty,.loading{background:#fff;border-radius:14px;padding:60px 24px;text-align:center;color:var(--gray);font-size:14px;grid-column:1/-1}
+
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(8,17,32,.6);z-index:100;align-items:center;justify-content:center;padding:16px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;width:100%;max-width:420px;border-radius:16px;overflow:hidden;max-height:88vh;overflow-y:auto}
+  .modal-top{background:linear-gradient(135deg,var(--navy),var(--blue));padding:20px 22px;color:#fff;position:relative}
+  .modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.18);border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1}
+  .modal-top .venue{font-size:16px;font-weight:700}
+  .modal-body{padding:20px 22px 24px}
+
+  .hhbw-box{font-family:inherit}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="brand">
+      <svg width="26" height="26" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="34" fill="none" stroke="#7FC4F5" stroke-width="7"/><circle cx="48" cy="48" r="9" fill="#7FC4F5"/><line x1="48" y1="6" x2="48" y2="20" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/><line x1="48" y1="76" x2="48" y2="90" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/><line x1="6" y1="48" x2="20" y2="48" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/><line x1="76" y1="48" x2="90" y2="48" stroke="#7FC4F5" stroke-width="7" stroke-linecap="round"/></svg>
+      <span class="wordmark">콕패스<small>KOKPASS</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="partners.html">제휴 업장</a>
+      <a href="#" id="logout-link">로그아웃</a>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <div class="sec-tag">Personal Checkout</div>
+    <h1>개인 구매</h1>
+    <p>원하는 입장권을 선택해 바로 온라인 결제로 구매하실 수 있습니다.</p>
+  </div>
+</section>
+
+<section class="content">
+  <div class="wrap">
+    <div id="list" class="grid">
+      <div class="loading">상품을 불러오는 중입니다...</div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-bg" id="buy-modal" onclick="if(event.target===this) closeBuy()">
+  <div class="modal">
+    <div class="modal-top">
+      <button class="modal-close" onclick="closeBuy()">×</button>
+      <div class="venue" id="modal-venue"></div>
+    </div>
+    <div class="modal-body">
+      <div class="hhbw-mount" id="buy-mount"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/buy-widget.js"></script>
+<script>
+const SB_URL = 'https://xoupacfmkhuuvxebgfqi.supabase.co';
+const SB_KEY = 'sb_publishable_46KQebvC7_S-_JDramvDmA_jk9aSeVc';
+const sbAuth = supabase.createClient(SB_URL, SB_KEY);
+
+async function sbFetch(path) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
+  });
+  if (!res.ok) throw new Error(`오류 ${res.status}`);
+  return res.json();
+}
+
+function money(n) { return Number(n || 0).toLocaleString('ko-KR') + '원'; }
+
+function cardHtml(p) {
+  return `
+    <div class="card">
+      <div class="card-top">
+        <div class="emoji">${p.emoji || '🎟️'}</div>
+        <div class="venue">${p.vname || p.name}</div>
+      </div>
+      <div class="card-body">
+        <div class="desc">${p.desc || p.name}</div>
+        <div class="card-price">${money(p.indiv_price)} <small>1인</small></div>
+        <button type="button" class="buy-btn" onclick="openBuy('${p.id}', '${(p.vname || p.name).replace(/'/g, "\\'")}')">구매하기 →</button>
+      </div>
+    </div>
+  `;
+}
+
+async function loadCatalog() {
+  const list = document.getElementById('list');
+  try {
+    const rows = await sbFetch('indiv_products_public?select=*&order=sort_order.asc');
+    if (!rows || !rows.length) {
+      list.innerHTML = `<div class="empty">현재 판매 중인 상품이 없습니다.</div>`;
+      return;
+    }
+    list.innerHTML = rows.map(cardHtml).join('');
+  } catch (e) {
+    list.innerHTML = `<div class="empty">불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>`;
+  }
+}
+
+function openBuy(productId, venueName) {
+  document.getElementById('modal-venue').textContent = venueName;
+  document.getElementById('buy-modal').classList.add('open');
+  const mount = document.getElementById('buy-mount');
+  mount.innerHTML = '';
+  HHBuyWidget.init({ mount: '#buy-mount', productId, venueName });
+}
+function closeBuy() {
+  document.getElementById('buy-modal').classList.remove('open');
+}
+
+(async function guardAuthAndInit() {
+  const { data: { session } } = await sbAuth.auth.getSession();
+  if (!session) {
+    location.href = 'login.html?redirect=shop.html';
+    return;
+  }
+  document.getElementById('logout-link').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await sbAuth.auth.signOut();
+    location.href = 'index.html';
+  });
+  loadCatalog();
+})();
+</script>
+</body>
+</html>
