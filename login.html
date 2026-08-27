@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 / 회원가입 | 콕패스 KOKPASS</title>
+<meta name="robots" content="noindex">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap');
+  :root{
+    --navy:#12332F;--navy2:#0E9E8F;--navy3:#0B7E72;--blue:#0E9E8F;--sky:#8FD9CF;
+    --teal:#0E9E8F;--mint:#E6F3F1;--cream:#F2F7F5;--ink:#12332F;--gray:#5E7570;--line:rgba(18,51,47,.12);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.6}
+  .topbar{background:radial-gradient(120% 260% at 50% -60%,#132C4E 0%,var(--navy) 60%,#081527 100%);padding:16px 20px;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .topbar .wordmark{color:#fff;font-weight:700;font-size:15px}
+  .topbar .wordmark small{display:block;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:2.5px;color:var(--sky)}
+
+  .wrap{max-width:420px;margin:0 auto;padding:40px 16px 60px}
+  .card{background:#fff;border-radius:16px;box-shadow:0 8px 28px rgba(11,32,56,.08);overflow:hidden}
+  .card-head{background:linear-gradient(135deg,var(--navy),var(--blue));padding:24px;color:#fff}
+  .card-head .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.8;margin-bottom:6px}
+  .card-head .title{font-size:20px;font-weight:800}
+  .card-body{padding:24px}
+
+  .tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--line)}
+  .tab-btn{flex:1;padding:11px 4px;background:none;border:none;font-family:inherit;font-size:14.5px;font-weight:700;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s}
+  .tab-btn.active{color:var(--navy);border-bottom-color:var(--blue)}
+
+  .lead-msg{font-size:12.5px;color:var(--gray);line-height:1.6;margin-bottom:16px}
+
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .field input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:8px;font-size:15px;font-family:inherit;background:#fafbfd}
+  .field input:focus{outline:none;border-color:var(--blue);background:#fff}
+
+  .submit-btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--navy);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s;font-family:inherit}
+  .submit-btn:hover{background:var(--blue)}
+  .submit-btn:disabled{background:var(--line);color:var(--gray);cursor:not-allowed}
+
+  .msg{font-size:12.5px;color:var(--gray);margin-top:12px;line-height:1.6;min-height:1px}
+  .msg.error{color:#dc2626}
+  .msg.success{color:#16a34a}
+  .link-back{display:block;text-align:center;margin-top:16px;font-size:12.5px;color:var(--gray);text-decoration:none}
+  .link-back:hover{color:var(--blue)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <svg width="24" height="24" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="34" fill="none" stroke="#0E9E8F" stroke-width="7"/><circle cx="48" cy="48" r="9" fill="#0E9E8F"/><line x1="48" y1="6" x2="48" y2="20" stroke="#0E9E8F" stroke-width="7" stroke-linecap="round"/><line x1="48" y1="76" x2="48" y2="90" stroke="#0E9E8F" stroke-width="7" stroke-linecap="round"/><line x1="6" y1="48" x2="20" y2="48" stroke="#0E9E8F" stroke-width="7" stroke-linecap="round"/><line x1="76" y1="48" x2="90" y2="48" stroke="#0E9E8F" stroke-width="7" stroke-linecap="round"/></svg>
+  <span class="wordmark">콕패스<small>KOKPASS · 개인 회원</small></span>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="card-head">
+      <div class="eyebrow">Sign Up · Login</div>
+      <div class="title">로그인 / 회원가입</div>
+    </div>
+    <div class="card-body">
+
+      <div id="step-email-wrap">
+        <div class="tabs">
+          <button type="button" class="tab-btn active" id="tab-login-btn" onclick="switchTab('login')">로그인</button>
+          <button type="button" class="tab-btn" id="tab-signup-btn" onclick="switchTab('signup')">회원가입</button>
+        </div>
+
+        <div id="panel-login">
+          <p class="lead-msg">가입하신 이메일을 입력하시면 인증코드를 보내드립니다. 비밀번호는 필요 없습니다.</p>
+          <div class="field">
+            <label>이메일</label>
+            <input type="email" id="login-email" placeholder="example@email.com">
+          </div>
+          <button type="button" class="submit-btn" id="login-send-btn" onclick="sendCode('login')">인증코드 받기</button>
+          <div class="msg" id="login-msg"></div>
+        </div>
+
+        <div id="panel-signup" style="display:none">
+          <p class="lead-msg">이메일 인증코드로 바로 회원가입됩니다. 가입 후 개인 구매 페이지를 이용하실 수 있습니다.</p>
+          <div class="field">
+            <label>이름</label>
+            <input type="text" id="signup-name" placeholder="이름을 입력해주세요">
+          </div>
+          <div class="field">
+            <label>연락처</label>
+            <input type="tel" id="signup-phone" placeholder="010-0000-0000">
+          </div>
+          <div class="field">
+            <label>이메일</label>
+            <input type="email" id="signup-email" placeholder="example@email.com">
+          </div>
+          <button type="button" class="submit-btn" id="signup-send-btn" onclick="sendCode('signup')">인증코드 받기</button>
+          <div class="msg" id="signup-msg"></div>
+        </div>
+      </div>
+
+      <div id="step-code" style="display:none">
+        <p style="font-size:12.5px;color:var(--gray);line-height:1.6;margin-bottom:16px" id="code-sent-to">입력하신 이메일로 인증코드를 보내드렸습니다.</p>
+        <div class="field">
+          <label>인증코드</label>
+          <input type="text" id="f-code" placeholder="이메일로 받은 코드 입력" inputmode="numeric" maxlength="12" style="letter-spacing:3px;font-size:20px;text-align:center;font-weight:700">
+        </div>
+        <button type="button" class="submit-btn" id="verify-btn" onclick="verifyCode()">인증코드 확인</button>
+        <div class="msg" id="code-msg"></div>
+        <a href="#" class="link-back" onclick="resendCode();return false" id="resend-link">인증코드 다시 받기</a>
+        <a href="#" class="link-back" onclick="backToEmail();return false">이메일 다시 입력하기</a>
+      </div>
+
+      <div id="step-checking" style="display:none">
+        <div class="msg" style="font-size:14px;color:var(--ink)">로그인 확인 중입니다...</div>
+      </div>
+
+      <div id="step-complete-profile" style="display:none">
+        <p class="lead-msg">회원 정보를 조금만 더 채워주세요.</p>
+        <div class="field">
+          <label>이름</label>
+          <input type="text" id="cp-name" placeholder="홍길동">
+        </div>
+        <div class="field">
+          <label>연락처</label>
+          <input type="tel" id="cp-phone" placeholder="010-0000-0000">
+        </div>
+        <button type="button" class="submit-btn" id="cp-save-btn" onclick="completeProfile()">완료</button>
+        <div class="msg" id="cp-msg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://okdahyvqhbqvfpvtpcip.supabase.co';
+const SB_KEY = 'sb_publishable_or8TBFpfxdJFC4MbC3PLrg_adM9L9h3';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let pendingEmail = '';
+let pendingName = '';
+let pendingPhone = '';
+let pendingMode = 'login';
+
+function getRedirectTarget() {
+  const params = new URLSearchParams(location.search);
+  return params.get('redirect') || 'index.html';
+}
+
+function switchTab(mode) {
+  document.getElementById('tab-login-btn').classList.toggle('active', mode === 'login');
+  document.getElementById('tab-signup-btn').classList.toggle('active', mode === 'signup');
+  document.getElementById('panel-login').style.display = mode === 'login' ? '' : 'none';
+  document.getElementById('panel-signup').style.display = mode === 'signup' ? '' : 'none';
+}
+
+function showStep(step) {
+  document.getElementById('step-email-wrap').style.display = step === 'email' ? '' : 'none';
+  document.getElementById('step-code').style.display = step === 'code' ? '' : 'none';
+  document.getElementById('step-checking').style.display = step === 'checking' ? '' : 'none';
+  document.getElementById('step-complete-profile').style.display = step === 'complete-profile' ? '' : 'none';
+}
+
+async function sendCode(mode) {
+  const msg = document.getElementById(mode === 'login' ? 'login-msg' : 'signup-msg');
+  const btn = document.getElementById(mode === 'login' ? 'login-send-btn' : 'signup-send-btn');
+  let email = '', name = '', phone = '';
+
+  if (mode === 'login') {
+    email = document.getElementById('login-email').value.trim();
+    if (!email) { msg.textContent = '이메일을 입력해주세요.'; msg.className = 'msg error'; return; }
+  } else {
+    name = document.getElementById('signup-name').value.trim();
+    phone = document.getElementById('signup-phone').value.trim();
+    email = document.getElementById('signup-email').value.trim();
+    if (!name) { msg.textContent = '이름을 입력해주세요.'; msg.className = 'msg error'; return; }
+    if (!phone) { msg.textContent = '연락처를 입력해주세요.'; msg.className = 'msg error'; return; }
+    if (!email) { msg.textContent = '이메일을 입력해주세요.'; msg.className = 'msg error'; return; }
+  }
+
+  btn.disabled = true; btn.textContent = '전송 중...';
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: mode === 'login'
+      ? { shouldCreateUser: false }
+      : { shouldCreateUser: true, data: { name, phone, privacy_consent: true, terms_consent: true } },
+  });
+  btn.disabled = false; btn.textContent = '인증코드 받기';
+
+  if (error) {
+    if (mode === 'login') {
+      msg.innerHTML = '가입 내역을 찾을 수 없습니다. 아직 회원이 아니시라면 <a href="#" onclick="switchTab(\'signup\');return false" style="color:var(--blue);text-decoration:underline">회원가입</a>을 진행해주세요.';
+    } else {
+      msg.textContent = '전송 실패: ' + error.message;
+    }
+    msg.className = 'msg error';
+    return;
+  }
+  pendingEmail = email; pendingName = name; pendingPhone = phone; pendingMode = mode;
+  document.getElementById('code-sent-to').textContent = `${email} 로 인증코드를 보내드렸습니다.`;
+  document.getElementById('f-code').value = '';
+  document.getElementById('code-msg').textContent = '';
+  showStep('code');
+}
+
+async function verifyCode() {
+  const code = document.getElementById('f-code').value.trim();
+  const msg = document.getElementById('code-msg');
+  const btn = document.getElementById('verify-btn');
+  if (!code) { msg.textContent = '이메일로 받은 코드를 입력해주세요.'; msg.className = 'msg error'; return; }
+
+  btn.disabled = true; btn.textContent = '확인 중...';
+  const { data, error } = await sb.auth.verifyOtp({ email: pendingEmail, token: code, type: 'email' });
+  btn.disabled = false; btn.textContent = '인증코드 확인';
+
+  if (error) {
+    msg.textContent = '인증 실패: 코드가 올바르지 않거나 만료되었습니다. 다시 시도해주세요.';
+    msg.className = 'msg error';
+    return;
+  }
+  if (data && data.session) {
+    showStep('checking');
+  }
+}
+
+async function resendCode() {
+  const msg = document.getElementById('code-msg');
+  if (!pendingEmail) { backToEmail(); return; }
+  msg.textContent = '재전송 중...';
+  msg.className = 'msg';
+  const { error } = await sb.auth.signInWithOtp({
+    email: pendingEmail,
+    options: pendingMode === 'login'
+      ? { shouldCreateUser: false }
+      : { shouldCreateUser: true, data: { name: pendingName, phone: pendingPhone, privacy_consent: true, terms_consent: true } },
+  });
+  msg.textContent = error ? ('재전송 실패: ' + error.message) : '인증코드를 다시 보내드렸습니다.';
+  msg.className = error ? 'msg error' : 'msg success';
+}
+
+async function completeProfile() {
+  const name = document.getElementById('cp-name').value.trim();
+  const phone = document.getElementById('cp-phone').value.trim();
+  const msg = document.getElementById('cp-msg');
+  if (!name) { msg.textContent = '이름을 입력해주세요.'; msg.className = 'msg error'; return; }
+  if (!phone) { msg.textContent = '연락처를 입력해주세요.'; msg.className = 'msg error'; return; }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'login.html'; return; }
+
+  const btn = document.getElementById('cp-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  const { error } = await sb.from('profiles').update({ name, phone }).eq('id', session.user.id);
+  btn.disabled = false; btn.textContent = '완료';
+
+  if (error) { msg.textContent = '저장 실패: ' + error.message; msg.className = 'msg error'; return; }
+  location.href = getRedirectTarget();
+}
+
+function backToEmail() {
+  showStep('email');
+}
+
+let authFlowStarted = false;
+async function finishAuth(session) {
+  if (!session || authFlowStarted) return;
+  authFlowStarted = true;
+
+  try {
+    const { data: profile } = await sb.from('profiles').select('name, phone').eq('id', session.user.id).maybeSingle();
+    if (profile && (!profile.name || !profile.phone)) {
+      if (profile.phone) document.getElementById('cp-phone').value = profile.phone;
+      showStep('complete-profile');
+      return;
+    }
+  } catch (e) { /* 조회 실패 시에는 그냥 통과시켜 로그인은 막지 않음 */ }
+
+  location.href = getRedirectTarget();
+}
+
+sb.auth.onAuthStateChange((event, session) => { finishAuth(session); });
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) finishAuth(session);
+})();
+</script>
+</body>
+</html>
