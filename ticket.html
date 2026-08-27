@@ -2,121 +2,126 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>입장권 확인 — 콕패스</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>입장권 바코드 | 콕패스</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <style>
   :root{
     --teal:#0E9E8F; --tealDeep:#0B7E72; --ink:#12332F; --coral:#FF8A5B;
-    --bg:#F6FBFA; --gray:#5E7570; --graylight:#8FA19E; --band:#E6F3F1;
+    --cream:#F6FBFA; --gray:#5E7570; --graylight:#8FA19E; --line:#E1EEEB;
   }
-  *{box-sizing:border-box;}
-  body{margin:0; font-family:'Pretendard','Noto Sans KR',sans-serif; color:var(--ink); background:var(--bg); -webkit-font-smoothing:antialiased; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:28px 16px 60px;}
-  .wm{font-family:'Black Han Sans',sans-serif; font-size:19px; color:var(--ink); margin-bottom:22px; letter-spacing:.01em;}
-  .wm span{color:var(--teal);}
-  .card{width:100%; max-width:400px; background:#fff; border-radius:20px; padding:28px 24px 30px; box-shadow:0 8px 28px rgba(18,51,47,.08); text-align:center;}
-  .status{display:inline-flex; align-items:center; font-size:12px; font-weight:700; padding:6px 14px; border-radius:999px; margin-bottom:16px;}
-  .status.ok{background:var(--band); color:var(--tealDeep);}
-  .status.used{background:#EDEEEE; color:var(--gray);}
-  .status.refunded{background:#FFE9E0; color:#C24E2C;}
-  .venue{font-size:20px; font-weight:800; color:var(--ink); margin:0 0 4px;}
-  .ticket-name{font-size:14px; color:var(--gray); margin:0 0 22px;}
-  .barcode-wrap{background:#fff; border:1.5px solid rgba(18,51,47,.10); border-radius:14px; padding:18px 10px 10px; margin-bottom:18px;}
-  .barcode-wrap svg{max-width:100%; height:auto;}
-  .pin-text{font-size:13px; letter-spacing:.06em; color:var(--gray); font-weight:600; margin-top:2px;}
-  .meta{text-align:left; background:var(--bg); border-radius:12px; padding:14px 16px; font-size:12.5px; color:var(--gray); line-height:1.9;}
-  .meta b{color:var(--ink); font-weight:700;}
-  .guide{font-size:12.5px; color:var(--graylight); margin-top:20px; line-height:1.7;}
-  .state-msg{padding:80px 0; text-align:center; color:var(--graylight); font-size:14px;}
-  .grayed{opacity:.45;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard','Noto Sans KR',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px}
+  .card{background:#fff;border-radius:18px;box-shadow:0 8px 32px rgba(18,51,47,.09);max-width:420px;width:100%;overflow:hidden}
+  .card-head{background:linear-gradient(135deg,var(--tealDeep),var(--teal));padding:22px 24px;color:#fff}
+  .card-head .brand{font-family:'Black Han Sans',sans-serif;font-size:12px;letter-spacing:.08em;opacity:.85;margin-bottom:6px}
+  .card-head .venue{font-size:20px;font-weight:800;letter-spacing:-.02em}
+  .card-head .ticket{font-size:13px;opacity:.9;margin-top:2px}
+  .card-body{padding:26px 24px 24px}
+  .row{display:flex;justify-content:space-between;font-size:13px;color:var(--gray);padding:7px 0;border-bottom:1px solid var(--line)}
+  .row:last-of-type{border-bottom:none;margin-bottom:18px}
+  .row span:last-child{color:var(--ink);font-weight:600}
+  .barcode-wrap{background:#fafdfc;border:1px solid var(--line);border-radius:12px;padding:18px 10px;text-align:center;overflow-x:auto}
+  .barcode-wrap svg{max-width:100%}
+  .pin-fallback{font-size:20px;font-weight:800;letter-spacing:.08em;color:var(--ink);padding:20px 0}
+  .notice{margin-top:16px;background:#EAF6F4;border:1px solid #CDE9E5;border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--tealDeep);line-height:1.6}
+  .state{padding:60px 24px;text-align:center;color:var(--gray);font-size:14px;line-height:1.8}
+  .state strong{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+  .foot{margin-top:24px;text-align:center;font-size:11.5px;color:var(--gray);line-height:1.8}
+  .foot a{color:var(--tealDeep);text-decoration:none}
 </style>
 </head>
 <body>
-  <div class="wm">콕<span>패스</span></div>
-  <div class="card" id="card">
-    <div class="state-msg" id="loading">불러오는 중...</div>
-  </div>
-  <div class="guide" id="guideText" style="display:none;">현장 직원에게 이 화면의 바코드를 보여주세요.<br>바코드가 인식되지 않으면 아래 번호를 직접 알려주세요.</div>
 
-  <script>
-    (function () {
-      const SB_URL = 'https://okdahyvqhbqvfpvtpcip.supabase.co';
+<div class="card" id="card">
+  <div class="state" id="state">불러오는 중입니다...</div>
+</div>
 
-      function esc(s) {
-        return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-      }
-      function fmtDate(iso) {
-        if (!iso) return '';
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return iso;
-        return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-      }
+<div class="foot">
+  콕패스(뷰홀릭) · 사업자등록번호 812-14-01466<br>
+  문의 <a href="tel:010-9747-8999">010-9747-8999</a> · <a href="index.html">홈페이지 바로가기</a>
+</div>
 
-      const STATUS_LABEL = {
-        available: { text: '판매 전', cls: 'used' },
-        sold:      { text: '미사용',  cls: 'ok' },
-        used:      { text: '사용완료', cls: 'used' },
-        refunded:  { text: '환불됨',  cls: 'refunded' },
-      };
+<script>
+const SB_URL = 'https://okdahyvqhbqvfpvtpcip.supabase.co';
+const SB_KEY = 'sb_publishable_or8TBFpfxdJFC4MbC3PLrg_adM9L9h3';
 
-      async function loadTicket() {
-        const card = document.getElementById('card');
-        const pin = new URLSearchParams(location.search).get('pin');
-        if (!pin) {
-          card.innerHTML = '<div class="state-msg">입장권 정보를 찾을 수 없습니다.<br>링크를 다시 확인해주세요.</div>';
-          return;
-        }
-        try {
-          const res = await fetch(`${SB_URL}/functions/v1/pin-lookup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pin }),
-          });
-          const data = await res.json().catch(() => ({}));
-          const t = data && data.ticket;
-          if (!res.ok || !t) {
-            card.innerHTML = '<div class="state-msg">입장권 정보를 찾을 수 없습니다.<br>구매하신 문자를 다시 확인해주세요.</div>';
-            return;
-          }
+function fmtDate(s){
+  if(!s) return '—';
+  const d = new Date(s);
+  if (isNaN(d)) return s;
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-          const st = STATUS_LABEL[t.status] || { text: t.status || '', cls: 'used' };
-          const isGrayed = t.status === 'used' || t.status === 'refunded';
-          const validLine = (t.valid_from || t.valid_to)
-            ? `<div><b>이용기간</b> ${fmtDate(t.valid_from)} ~ ${fmtDate(t.valid_to)}</div>` : '';
+async function loadTicket() {
+  const params = new URLSearchParams(location.search);
+  const pin = (params.get('pin') || '').trim();
+  const card = document.getElementById('card');
 
-          card.innerHTML = `
-            <span class="status ${st.cls}">${esc(st.text)}</span>
-            <div class="venue">${esc(t.venue_name || '')}</div>
-            <div class="ticket-name">${esc(t.ticket_name || '')}</div>
-            <div class="barcode-wrap ${isGrayed ? 'grayed' : ''}">
-              <svg id="barcodeSvg"></svg>
-              <div class="pin-text">${esc(t.pin_number || '')}</div>
-            </div>
-            <div class="meta">
-              ${t.buyer_name ? `<div><b>예약자</b> ${esc(t.buyer_name)}</div>` : ''}
-              ${validLine}
-            </div>
-          `;
+  if (!pin) {
+    card.innerHTML = `<div class="state"><strong>바코드 정보를 찾을 수 없습니다</strong>링크가 올바른지 확인해주세요.<br>문제가 계속되면 010-9747-8999로 문의해주세요.</div>`;
+    return;
+  }
 
-          if (window.JsBarcode && t.pin_number) {
-            try {
-              JsBarcode('#barcodeSvg', t.pin_number, {
-                format: 'CODE128', width: 2.2, height: 70, displayValue: false, margin: 6,
-              });
-            } catch (e) { /* 바코드 렌더 실패 시 번호 텍스트로만 안내 */ }
-          }
+  try {
+    // pin_inventory는 anon 키로 직접 조회할 수 없도록 막혀있습니다(입장권 바코드 전체공개 방지).
+    // 대신 정확히 이 핀번호 1건만 조회해주는 공개 Edge Function(pin-lookup)을 거칩니다.
+    const res = await fetch(`${SB_URL}/functions/v1/pin-lookup`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin }),
+    });
+    const data = await res.json();
+    const p = data && data.ticket ? data.ticket : null;
 
-          document.getElementById('guideText').style.display = isGrayed ? 'none' : 'block';
-        } catch (e) {
-          card.innerHTML = `<div class="state-msg">불러오지 못했습니다.<br>${esc(e.message || '')}</div>`;
-        }
-      }
-      loadTicket();
-    })();
-  </script>
+    if (!p) {
+      card.innerHTML = `<div class="state"><strong>바코드 정보를 찾을 수 없습니다</strong>링크가 올바른지 확인해주세요.<br>문제가 계속되면 010-9747-8999로 문의해주세요.</div>`;
+      return;
+    }
+
+    // 취소/환불되었거나 이미 사용된 입장권은 바코드를 아예 노출하지 않는다 (재입장 악용 방지)
+    if (p.status === 'refunded') {
+      card.innerHTML = `<div class="state"><strong>취소된 입장권입니다</strong>이 예약(입장권)은 취소 또는 환불 처리되어 더 이상 사용하실 수 없습니다.<br>문의사항은 010-9747-8999로 연락해주세요.</div>`;
+      return;
+    }
+    if (p.status === 'used') {
+      card.innerHTML = `<div class="state"><strong>이미 사용된 입장권입니다</strong>현장에서 이미 사용 처리된 입장권입니다.<br>문의사항은 010-9747-8999로 연락해주세요.</div>`;
+      return;
+    }
+
+    card.innerHTML = `
+      <div class="card-head">
+        <div class="brand">콕패스 입장권</div>
+        <div class="venue">${esc(p.venue_name)}</div>
+        <div class="ticket">${esc(p.ticket_name)}</div>
+      </div>
+      <div class="card-body">
+        ${p.buyer_name ? `<div class="row"><span>예약자</span><span>${esc(p.buyer_name)}</span></div>` : ''}
+        <div class="row"><span>유효기간</span><span>${fmtDate(p.valid_from)} ~ ${fmtDate(p.valid_to)}</span></div>
+        <div class="barcode-wrap">
+          <svg id="barcode-svg"></svg>
+        </div>
+        <div class="notice">현장 입장 시 이 화면의 바코드를 제시해주세요. 화면 캡처본도 사용 가능합니다.</div>
+      </div>`;
+
+    try {
+      JsBarcode('#barcode-svg', p.pin_number, { format:'CODE128', width:2.4, height:90, displayValue:true, fontSize:16, margin:8 });
+    } catch(e) {
+      document.querySelector('.barcode-wrap').innerHTML = `<div class="pin-fallback">${esc(p.pin_number)}</div>`;
+    }
+  } catch (e) {
+    card.innerHTML = `<div class="state"><strong>불러오지 못했습니다</strong>잠시 후 다시 시도해주세요.<br>010-9747-8999로 문의해주세요.</div>`;
+  }
+}
+
+loadTicket();
+</script>
 </body>
 </html>
