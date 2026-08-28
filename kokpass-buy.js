@@ -310,20 +310,12 @@
     state.mountEl.classList.add('kpbw-box');
     state.mountEl.innerHTML = `<div class="kpbw-state"><strong>결제 확인 중입니다...</strong>잠시만 기다려주세요.</div>`;
   }
-  function showConfirmedState(state, pins) {
-    state.mountEl.innerHTML = `
-      <div class="kpbw-state">
-        <strong>결제가 완료됐습니다!</strong>
-        발급된 바코드: <b>${escapeAttr((pins && pins[0]) || '-')}</b>
-        <div class="sub">입력하신 연락처로 입장 안내가 발송됩니다. (마이페이지 기능은 준비 중입니다)</div>
-      </div>`;
-  }
   function showConfirmFailedState(state, message) {
     state.mountEl.innerHTML = `
       <div class="kpbw-state">
         <strong>결제 확인에 실패했습니다</strong>
         ${escapeAttr(message || '결제 승인 중 문제가 발생했습니다.')}
-        <div class="sub">문의: 고객센터 (연락처 준비 중)</div>
+        <div class="sub">문의: 고객센터 010-9747-8999</div>
       </div>`;
   }
 
@@ -340,8 +332,9 @@
       showConfirmingState(state);
       const confirmed = await fnFetch('confirm', { orderId, paymentKey, amount: Number(amount) });
       if (confirmed.ok) {
-        showConfirmedState(state, confirmed.data?.data?.pins);
-        history.replaceState(null, '', location.pathname);
+        // 더블에이치(ion-jumpkids.html)와 동일하게 결제 완료 즉시 바코드 확인 페이지로 이동합니다.
+        const pins = confirmed.data?.data?.pins || [];
+        location.href = 'ticket.html?pin=' + encodeURIComponent(pins[0] || '');
         return true;
       }
       showConfirmFailedState(state, confirmed.data?.message);
